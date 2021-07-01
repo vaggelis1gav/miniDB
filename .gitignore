@@ -1,4 +1,5 @@
 dbdata/
 __pycache__/
+.idea/
 .idea
 .pytest_cache
