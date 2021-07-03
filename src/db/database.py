@@ -6,6 +6,8 @@ import os
 from .btree import Btree
 import shutil
 from .misc import split_condition
+import logging
+import warnings
 
 class Database:
     '''
@@ -21,10 +23,10 @@ class Database:
         if load:
             try:
                 self.load(self.savedir)
-                print(f'Loaded "{name}".')
+                logging.info(f'Loaded "{name}".')
                 return
             except:
-                print(f'"{name}" db does not exist, creating new.')
+                warnings.warn(f'Database "{name}" does not exist. Creating new.')
 
         # create dbdata directory if it doesnt exist
         if not os.path.exists('dbdata'):
@@ -114,7 +116,7 @@ class Database:
         else:
             raise Exception(f'Attribute "{name}" already exists in class "{self.__class__.__name__}".')
         # self.no_of_tables += 1
-        print(f'New table "{name}"')
+        logging.info(f'Created table "{name}".')
         self._update()
         self.save()
 
@@ -135,7 +137,7 @@ class Database:
         if os.path.isfile(f'{self.savedir}/{table_name}.pkl'):
             os.remove(f'{self.savedir}/{table_name}.pkl')
         else:
-            print(f'"{self.savedir}/{table_name}.pkl" does not exist.')
+            warnings.warn(f'"{self.savedir}/{table_name}.pkl" not found.')
         self.delete('meta_locks', f'table_name=={table_name}')
         self.delete('meta_length', f'table_name=={table_name}')
         self.delete('meta_insert_stack', f'table_name=={table_name}')
@@ -261,8 +263,8 @@ class Database:
         try:
             self.tables[table_name]._insert(row, insert_stack)
         except Exception as e:
-            print(e)
-            print('ABORTED')
+            logging.info(e)
+            logging.info('ABORTED')
         # sleep(2)
         self._update_meta_insert_stack_for_tb(table_name, insert_stack[:-1])
         if lock_load_save:
@@ -408,7 +410,7 @@ class Database:
         '''
         self.load(self.savedir)
         if self.is_locked(left_table_name) or self.is_locked(right_table_name):
-            print(f'Table/Tables are currently locked')
+            warnings.warn(f'Table(s) are currently locked.')
             return
 
         res = self.tables[left_table_name]._inner_join(self.tables[right_table_name], condition)
@@ -463,7 +465,7 @@ class Database:
         try:
             res = self.select('meta_locks', ['locked'], f'table_name=={table_name}', return_object=True).locked[0]
             if res:
-                print(f'Table "{table_name}" is currently locked.')
+                logging.info(f'Table "{table_name}" is currently locked.')
             return res
 
         except IndexError:
@@ -558,20 +560,18 @@ class Database:
             index_name: string. Name of the created index.
         '''
         if self.tables[table_name].pk_idx is None: # if no primary key, no index
-            print('## ERROR - Cant create index. Table has no primary key.')
-            return
+            raise Exception('Cannot create index. Table has no primary key.')
         if index_name not in self.tables['meta_indexes'].index_name:
             # currently only btree is supported. This can be changed by adding another if.
             if index_type=='Btree':
-                print('Creating Btree index.')
+                logging.info('Creating Btree index.')
                 # insert a record with the name of the index and the table on which it's created to the meta_indexes table
                 self.tables['meta_indexes']._insert([table_name, index_name])
                 # crate the actual index
                 self._construct_index(table_name, index_name)
                 self.save()
         else:
-            print('## ERROR - Cant create index. Another index with the same name already exists.')
-            return
+            raise Exception('Cannot create index. Another index with the same name already exists.')
 
     def _construct_index(self, table_name, index_name):
         '''
