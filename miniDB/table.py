@@ -216,15 +216,36 @@ class Table:
         # if * return all columns, else find the column indexes for the columns specified
         if return_columns == '*':
             return_cols = [i for i in range(len(self.column_names))]
+        # Select DISTINCT
+        distinct = False 
+        # check if distinct is in return_columns (it means is after select)
+        if 'distinct' in return_columns:
+            distinct = True 
+            # take columns (remove distinct from return columns)
+            return_columns_tmp = return_columns.split('distinct')[1].strip().split(',')
+            # select everything 
+            if '*' in return_columns_tmp:
+                return_cols = [i for i in range (len(self.column_names))]
+            # select specified columns 
+            else:
+                return_cols = [self.column_name.index(col.strip()) for col in return_columns_tmp]
+          # Basic SELECT
+        
         else:
             return_cols = [self.column_names.index(col.strip()) for col in return_columns.split(',')]
-
+        # return_cols = [self.column_names.index(col.strip()) for col in return_columns.split(',')]
+        
+        # if * return all columns else find the column indexes for the columns specified 
+        if return_columns = = '*':
+            return_cols = [i for i in range (len(self.column_names))]
+            else:
+                return_cols = [self.column_name.index(col.strip()] for col in return_columns.split(',')]
         # if condition is None, return all rows
         # if not, return the rows with values where condition is met for value
         if condition is not None:
             column_name, operator, value = self._parse_condition(condition)
             column = self.column_by_name(column_name)
-            rows = [ind for ind, x in enumerate(column) if get_op(operator, x, value)]
+            rows = [ind for ind, x in enumerate(column) if get_op(operator, x, value)
         else:
             rows = [i for i in range(len(self.data))]
 
