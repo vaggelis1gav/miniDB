@@ -108,6 +108,12 @@ class Database:
             primary_key: string. The primary key (if it exists).
             load: boolean. Defines table object parameters as the name of the table and the column names.
         '''
+        def create_table string(self, name, column_names, column_types, primary_key(string), foreign_key(the primary key to the corresponding strong relationship), check(balance>=0)
+                                if foreign_key(the primary key to the corresponding strong relationship)
+                                on delete cascade
+                                on update cascade
+                                check(balance>=0)
+        # Foreign key = The primary key to the corresponding strong relationship.
         # print('here -> ', column_names.split(','))
         self.tables.update({name: Table(name=name, column_names=column_names.split(','), column_types=column_types.split(','), primary_key=primary_key, load=load)})
         # self._name = Table(name=name, column_names=column_names, column_types=column_types, load=load)
@@ -159,7 +165,7 @@ class Database:
                 colnames = line.strip('\n')
                 if column_types is None:
                     column_types = ",".join(['str' for _ in colnames.split(',')])
-                self.create_table(name=table_name, column_names=colnames, column_types=column_types, primary_key=primary_key)
+                self.create_table(name=table_name, column_names=colnames, column_types=column_types, primary_key=primary_key, foreign_key(string))
                 lock_ownership = self.lock_table(table_name, mode='x')
                 first_line = False
                 continue
