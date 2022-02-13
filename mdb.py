@@ -1,6 +1,7 @@
 import os
 import re
 from pprint import pprint
+from select import select
 import sys
 import readline
 import traceback
@@ -89,13 +90,27 @@ def create_query_plan(query, keywords, action):
             dic['primary key'] = arglist[arglist.index('primary')-2]
         else:
             dic['primary key'] = None
+    if 'foreign_key' in args:
+      arglist = args [1:-1]. replace (',',''). split(',')
+      indexfk = arglist.index ('foregn')
+      dec['foreign_key'] = arglist[indexfk-2] + '', ''+arglist[indexfk+2] +'',''+arglist [indexfk+3]
+      else:
+        dic['primary_key'] = none
     
     if action=='import': 
         dic = {'import table' if key=='import' else key: val for key, val in dic.items()}
 
     if action=='insert into':
         if dic['values'][0] == '(' and dic['values'][-1] == ')':
-            dic['values'] = dic['values'][1:-1]
+        if select in dic[insert into]:
+          s = dec [insert inti]. split ("") [1:]
+          if where in s:
+            dic [values] = {"select" : s [1]. "from" : s [3], "where"."".join(s[s:])}
+            else:
+              dic [values] = {"select":s[1], "from" : s[3], "where" : none}
+              dic [insert into] = dic [insert into].split("") [0]
+              elif dic[values] [0] = = '(' and dic[value] [-1] = = ')':
+                dic[value] = dic [value] [1 : -1]
         else:
             raise ValueError('Your parens are not right m8')
     
