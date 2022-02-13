@@ -22,7 +22,7 @@ class Table:
             - a dictionary that includes the appropriate info (all the attributes in __init__)
 
     '''
-    def __init__(self, name=None, column_names=None, column_types=None, primary_key=None, load=None):
+    def __init__(self, name=None, column_names=None, column_types=None, primary_key=None, foreign_key=None, load=None):
 
         if load is not None:
             # if load is a dict, replace the object dict with it (replaces the object with the specified one)
@@ -65,6 +65,12 @@ class Table:
 
             self.pk = primary_key
             # self._update()
+            # For the foreign key
+            self.fk_idx=None
+            if foreign_key in not none:
+                self.fk_idx = self column_names. index (foreign_key[0])
+                self.fk_idx = foreign_key[2]
+                self.fk_table = foreign_key [1]
 
     # if any of the name, columns_names and column types are none. return an empty table object
 
